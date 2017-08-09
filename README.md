@@ -26,6 +26,8 @@ This repo is his answer in an npm module (with some code cleanups and a bug fix)
 
 ## Usage
 
+import `retargetEvents` and call it with the `shadowDom`:
+
 ```jsx
 import retargetEvents from 'react-shadow-dom-retarget-events';
 
