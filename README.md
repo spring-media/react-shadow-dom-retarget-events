@@ -16,7 +16,7 @@ A bug is filed at [#10422](https://github.com/facebook/react/issues/10422).
 Luckily someone wrote [a workaround on Stack Overflow](https://stackoverflow.com/questions/37866237/click-event-not-firing-when-react-component-in-a-shadow-dom).
 It works by adding vanilla JS event listeners and dispatches events to React.
 
-This repo is his answer in an npm module.
+This repo is his answer in an npm module (with some code cleanups and a bug fix).
 
 ## Installation
 
