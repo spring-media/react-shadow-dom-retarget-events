@@ -20,7 +20,9 @@ This repo is his answer in an npm module (with some code cleanups and a bug fix)
 
 ## Installation
 
-`yarn add react-shadow-dom-retarget-events` / `npm install react-shadow-dom-retarget-events --save`
+`yarn add react-shadow-dom-retarget-events` or
+
+`npm install react-shadow-dom-retarget-events --save`
 
 ## Usage
 
