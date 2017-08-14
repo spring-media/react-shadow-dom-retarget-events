@@ -1,51 +1,85 @@
-'use strict';
+module.exports = function retargetEvents(shadowRoot) {
 
-(function (root, factory) {
+  const events = ["onAbort",
+    "onAnimationCancel",
+    "onAnimationEnd",
+    "onAnimationIteration",
+    "onAuxClick",
+    "onBlur",
+    "onChange",
+    "onClick",
+    "onClose",
+    "onContextMenu",
+    "onDoubleClick",
+    "onError",
+    "onFocus",
+    "onGotPointerCapture",
+    "onInput",
+    "onKeyDown",
+    "onKeyPress",
+    "onKeyUp",
+    "onLoad",
+    "onLoadEnd",
+    "onLoadStart",
+    "onLostPointerCapture",
+    "onMouseDown",
+    "onMouseMove",
+    "onMouseOut",
+    "onMouseOver",
+    "onMouseIp",
+    "onPointerCancel",
+    "onPointerDown",
+    "onPointerEnter",
+    "onPointerLeave",
+    "onPointerMove",
+    "onPointerOut",
+    "onPointerOver",
+    "onPointerUp",
+    "onReset",
+    "onResize",
+    "onScroll",
+    "onSelect",
+    "onSelectionChange",
+    "onSelectStart",
+    "onSubmit",
+    "onTouchCancel",
+    "onTouchMove",
+    "onTouchStart",
+    "onTransitionCancel",
+    "onTransitionEnd"];
 
-  if (typeof define === 'function' && define.amd) {
-    define(['retargetEvents'], factory);
-  } else if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
-  } else {
-    root.retargetEvents = factory();
-  }
+  for (const eventType of events) {
+    const transformedEventType = eventType.replace(/^on/, '').toLowerCase();
 
-}(this, function () {
+    shadowRoot.addEventListener(transformedEventType, function (event) {
+      for (const item of event.path) {
+        const internalComponent = findReactInternal(item);
 
-  function retargetEvents(shadowRoot) {
-    const events = 'onClick onContextMenu onDoubleClick onDrag onDragEnd onDragEnter onDragExit onDragLeave onDragOver onDragStart onDrop onMouseDown onMouseEnter onMouseLeave onMouseMove onMouseOut onMouseOver onMouseUp'.split(' ');
-
-    function dispatchEvent(event, eventType, itemProps) {
-      if (itemProps[eventType]) {
-        itemProps[eventType](event);
-      } else if (itemProps.children && itemProps.children.forEach) {
-        itemProps.children.forEach(child => {
-          child.props && dispatchEvent(event, eventType, child.props);
-        })
-      }
-    }
-
-    // Compatible with v0.14 & 15
-    function findReactInternal(item) {
-      for (let key in item) {
-        if (item.hasOwnProperty(key) && ~key.indexOf('_reactInternal')) {
-          return item[key];
-        }
-      }
-    }
-
-    events.forEach(eventType => {
-      const transformedEventType = eventType.replace(/^on/, '').toLowerCase();
-      shadowRoot.addEventListener(transformedEventType, event => {
-        const internalComponent = findReactInternal(event.target);
         if (internalComponent && internalComponent._currentElement && internalComponent._currentElement.props) {
           dispatchEvent(event, eventType, internalComponent._currentElement.props);
         }
-      });
+
+        if (item === shadowRoot) {
+          break;
+        }
+      }
     });
   }
+};
 
-  return retargetEvents;
+function findReactInternal(item) {
+  let instance;
+  for (let key in item) {
+    if (item.hasOwnProperty(key) && key.indexOf('_reactInternal') !== -1) {
+      instance = item[key];
+      break;
+    }
+  }
+  return instance;
+}
 
-}));
-
+function dispatchEvent(event, eventType, itemProps) {
+  if (itemProps[eventType]) {
+    itemProps[eventType](event);
+  }
+}
