@@ -49,7 +49,12 @@ module.exports = function retargetEvents(shadowRoot) {
         "onTransitionEnd"];
 
     events.forEach(function (eventType) {
-        const transformedEventType = eventType.replace(/^on/, '').toLowerCase();
+        let transformedEventType;
+        if(eventType === 'onDoubleClick'){
+            transformedEventType = 'dblclick';
+        }else{
+            transformedEventType = eventType.replace(/^on/, '').toLowerCase();
+        }
 
         shadowRoot.addEventListener(transformedEventType, function (event) {
             for (var i = 0; i < event.path.length; i++) {
