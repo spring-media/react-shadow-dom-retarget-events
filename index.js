@@ -46,10 +46,23 @@ module.exports = function retargetEvents(shadowRoot) {
         "onTouchMove",
         "onTouchStart",
         "onTransitionCancel",
-        "onTransitionEnd"];
+        "onTransitionEnd",
+        "onDrag",
+        "onDragEnd",
+        "onDragEnter",
+        "onDragExit",
+        "onDragLeave",
+        "onDragOver",
+        "onDragStart",
+        "onDrop"];
 
     events.forEach(function (eventType) {
-        const transformedEventType = eventType.replace(/^on/, '').toLowerCase();
+        let transformedEventType;
+        if(eventType === 'onDoubleClick'){
+            transformedEventType = 'dblclick';
+        }else{
+            transformedEventType = eventType.replace(/^on/, '').toLowerCase();
+        }
 
         shadowRoot.addEventListener(transformedEventType, function (event) {
             for (var i = 0; i < event.path.length; i++) {
