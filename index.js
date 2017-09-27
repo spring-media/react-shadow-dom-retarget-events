@@ -1,4 +1,3 @@
-
 var events = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimationIteration", "onAuxClick", "onBlur",
     "onChange", "onClick", "onClose", "onContextMenu", "onDoubleClick", "onError", "onFocus", "onGotPointerCapture",
     "onInput", "onKeyDown", "onKeyPress", "onKeyUp", "onLoad", "onLoadEnd", "onLoadStart", "onLostPointerCapture",
@@ -6,7 +5,7 @@ var events = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimationIter
     "onPointerEnter", "onPointerLeave", "onPointerMove", "onPointerOut", "onPointerOver", "onPointerUp", "onReset",
     "onResize", "onScroll", "onSelect", "onSelectionChange", "onSelectStart", "onSubmit", "onTouchCancel",
     "onTouchMove", "onTouchStart", "onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd", "onDragEnter",
-    "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop"];
+    "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop", "onFocusOut"];
 
 var divergentNativeEvents = {
     onDoubleClick: 'dblclick'
@@ -14,6 +13,7 @@ var divergentNativeEvents = {
 
 var mimickedReactEvents = {
     onInput: 'onChange',
+    onFocusOut: 'onBlur',
     onSelectionChange: 'onSelect'
 };
 
