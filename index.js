@@ -1,103 +1,76 @@
+
+var events = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimationIteration", "onAuxClick", "onBlur",
+    "onChange", "onClick", "onClose", "onContextMenu", "onDoubleClick", "onError", "onFocus", "onGotPointerCapture",
+    "onInput", "onKeyDown", "onKeyPress", "onKeyUp", "onLoad", "onLoadEnd", "onLoadStart", "onLostPointerCapture",
+    "onMouseDown", "onMouseMove", "onMouseOut", "onMouseOver", "onMouseUp", "onPointerCancel", "onPointerDown",
+    "onPointerEnter", "onPointerLeave", "onPointerMove", "onPointerOut", "onPointerOver", "onPointerUp", "onReset",
+    "onResize", "onScroll", "onSelect", "onSelectionChange", "onSelectStart", "onSubmit", "onTouchCancel",
+    "onTouchMove", "onTouchStart", "onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd", "onDragEnter",
+    "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop"];
+
+var divergentNativeEvents = {
+    onDoubleClick: 'dblclick'
+};
+
+var mimickedReactEvents = {
+    onInput: 'onChange',
+    onSelectionChange: 'onSelect'
+};
+
 module.exports = function retargetEvents(shadowRoot) {
 
-    const events = ["onAbort",
-        "onAnimationCancel",
-        "onAnimationEnd",
-        "onAnimationIteration",
-        "onAuxClick",
-        "onBlur",
-        "onChange",
-        "onClick",
-        "onClose",
-        "onContextMenu",
-        "onDoubleClick",
-        "onError",
-        "onFocus",
-        "onGotPointerCapture",
-        "onInput",
-        "onKeyDown",
-        "onKeyPress",
-        "onKeyUp",
-        "onLoad",
-        "onLoadEnd",
-        "onLoadStart",
-        "onLostPointerCapture",
-        "onMouseDown",
-        "onMouseMove",
-        "onMouseOut",
-        "onMouseOver",
-        "onMouseIp",
-        "onPointerCancel",
-        "onPointerDown",
-        "onPointerEnter",
-        "onPointerLeave",
-        "onPointerMove",
-        "onPointerOut",
-        "onPointerOver",
-        "onPointerUp",
-        "onReset",
-        "onResize",
-        "onScroll",
-        "onSelect",
-        "onSelectionChange",
-        "onSelectStart",
-        "onSubmit",
-        "onTouchCancel",
-        "onTouchMove",
-        "onTouchStart",
-        "onTransitionCancel",
-        "onTransitionEnd",
-        "onDrag",
-        "onDragEnd",
-        "onDragEnter",
-        "onDragExit",
-        "onDragLeave",
-        "onDragOver",
-        "onDragStart",
-        "onDrop"];
+    events.forEach(function (reactEventName) {
 
-    events.forEach(function (eventType) {
-        let transformedEventType;
-        if(eventType === 'onDoubleClick'){
-            transformedEventType = 'dblclick';
-        }else{
-            transformedEventType = eventType.replace(/^on/, '').toLowerCase();
-        }
+        var nativeEventName = getNativeEventName(reactEventName);
 
-        shadowRoot.addEventListener(transformedEventType, function (event) {
+        shadowRoot.addEventListener(nativeEventName, function (event) {
+
             for (var i = 0; i < event.path.length; i++) {
-                const item = event.path[i];
-                const internalComponent = findReactInternal(item);
 
-                if (internalComponent && internalComponent._currentElement && internalComponent._currentElement.props) {
-                    dispatchEvent(event, eventType, internalComponent._currentElement.props);
-                    // This mimics React's onChange behavior
-                    if (eventType === 'onInput') {
-                        dispatchEvent(event, 'onChange', internalComponent._currentElement.props);
-                    }
+                var el = event.path[i];
+                var reactComponent = findReactComponent(el);
+                var props = findReactProps(reactComponent);
+
+                if (reactComponent && props) {
+                    dispatchEvent(event, reactEventName, props);
                 }
 
-                if (item === shadowRoot) {
+                if (reactComponent && props && mimickedReactEvents[reactEventName]) {
+                    dispatchEvent(event, mimickedReactEvents[reactEventName], props);
+                }
+
+                if (el === shadowRoot) {
                     break;
                 }
             }
-        });
+        }, false);
     });
 };
 
-function findReactInternal(item) {
-    var instance;
+function findReactComponent(item) {
     for (var key in item) {
         if (item.hasOwnProperty(key) && key.indexOf('_reactInternal') !== -1) {
-            instance = item[key];
-            break;
+            return item[key];
         }
     }
-    return instance;
 }
 
-function dispatchEvent(event, eventType, itemProps) {
-    if (itemProps[eventType]) {
-        itemProps[eventType](event);
+function findReactProps(component) {
+    if (!component) return undefined;
+    if (component.memoizedProps) return component.memoizedProps; // React 16 Fiber
+    if (component._currentElement && component._currentElement.props) return component._currentElement.props; // React <=15
+
+}
+
+function dispatchEvent(event, eventType, componentProps) {
+    if (componentProps[eventType]) {
+        componentProps[eventType](event);
     }
+}
+
+function getNativeEventName(reactEventName) {
+    if (divergentNativeEvents[reactEventName]) {
+        return divergentNativeEvents[reactEventName];
+    }
+    return reactEventName.replace(/^on/, '').toLowerCase();
 }
