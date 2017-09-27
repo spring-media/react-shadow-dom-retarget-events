@@ -46,7 +46,15 @@ module.exports = function retargetEvents(shadowRoot) {
         "onTouchMove",
         "onTouchStart",
         "onTransitionCancel",
-        "onTransitionEnd"];
+        "onTransitionEnd",
+        "onDrag",
+        "onDragEnd",
+        "onDragEnter",
+        "onDragExit",
+        "onDragLeave",
+        "onDragOver",
+        "onDragStart",
+        "onDrop"];
 
     events.forEach(function (eventType) {
         const transformedEventType = eventType.replace(/^on/, '').toLowerCase();
