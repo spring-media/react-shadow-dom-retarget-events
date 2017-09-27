@@ -52,6 +52,10 @@ const proto = Object.create(HTMLElement.prototype, {
 });
 document.registerElement('my-custom-element', {prototype: proto});
 ```
+## History
+
+* v1.06 Support von React 16, Added Events, Code Cleanup
+* v1.05 Initial commits and basic functionality
 
 ## Credits
 
