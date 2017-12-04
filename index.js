@@ -24,10 +24,12 @@ module.exports = function retargetEvents(shadowRoot) {
         var nativeEventName = getNativeEventName(reactEventName);
 
         shadowRoot.addEventListener(nativeEventName, function (event) {
+            
+            var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
 
-            for (var i = 0; i < event.path.length; i++) {
+            for (var i = 0; i < path.length; i++) {
 
-                var el = event.path[i];
+                var el = path[i];
                 var reactComponent = findReactComponent(el);
                 var props = findReactProps(reactComponent);
 
@@ -73,4 +75,17 @@ function getNativeEventName(reactEventName) {
         return divergentNativeEvents[reactEventName];
     }
     return reactEventName.replace(/^on/, '').toLowerCase();
+}
+
+function composedPath(el) {
+  var path = [];
+  while (el) {
+    path.push(el);
+    if (el.tagName === 'HTML') {
+      path.push(document);
+      path.push(window);
+      return path;
+    }
+    el = el.parentElement;
+  }
 }
