@@ -1,11 +1,11 @@
 var events = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimationIteration", "onAuxClick", "onBlur",
-    "onChange", "onClick", "onClose", "onContextMenu", "onDoubleClick", "onError", "onFocus", "onGotPointerCapture",
-    "onInput", "onKeyDown", "onKeyPress", "onKeyUp", "onLoad", "onLoadEnd", "onLoadStart", "onLostPointerCapture",
-    "onMouseDown", "onMouseMove", "onMouseOut", "onMouseOver", "onMouseUp", "onPointerCancel", "onPointerDown",
-    "onPointerEnter", "onPointerLeave", "onPointerMove", "onPointerOut", "onPointerOver", "onPointerUp", "onReset",
-    "onResize", "onScroll", "onSelect", "onSelectionChange", "onSelectStart", "onSubmit", "onTouchCancel",
-    "onTouchMove", "onTouchStart", "onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd", "onDragEnter",
-    "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop", "onFocusOut"];
+"onChange", "onClick", "onClose", "onContextMenu", "onDoubleClick", "onError", "onFocus", "onGotPointerCapture",
+"onInput", "onKeyDown", "onKeyPress", "onKeyUp", "onLoad", "onLoadEnd", "onLoadStart", "onLostPointerCapture",
+"onMouseDown", "onMouseMove", "onMouseOut", "onMouseOver", "onMouseUp", "onPointerCancel", "onPointerDown",
+"onPointerEnter", "onPointerLeave", "onPointerMove", "onPointerOut", "onPointerOver", "onPointerUp", "onReset",
+"onResize", "onScroll", "onSelect", "onSelectionChange", "onSelectStart", "onSubmit", "onTouchCancel",
+"onTouchMove", "onTouchStart", "onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd", "onDragEnter",
+"onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop", "onFocusOut"];
 
 var divergentNativeEvents = {
     onDoubleClick: 'dblclick'
@@ -15,7 +15,7 @@ var mimickedReactEvents = {
     onInput: 'onChange',
     onFocusOut: 'onBlur',
     onSelectionChange: 'onSelect'
-};
+}; 
 
 module.exports = function retargetEvents(shadowRoot) {
 
@@ -38,6 +38,10 @@ module.exports = function retargetEvents(shadowRoot) {
                 if (reactComponent && props && mimickedReactEvents[reactEventName]) {
                     dispatchEvent(event, mimickedReactEvents[reactEventName], props);
                 }
+
+                if (event.cancelBubble) { 
+                    break; 
+                }                
 
                 if (el === shadowRoot) {
                     break;
