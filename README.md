@@ -29,6 +29,7 @@ This repo is his answer in an npm module (with some code cleanups and a bug fix)
 import `retargetEvents` and call it with the `shadowDom`:
 
 ```jsx
+import React from 'react';
 import retargetEvents from 'react-shadow-dom-retarget-events';
 
 class App extends React.Component {
@@ -57,7 +58,3 @@ document.registerElement('my-custom-element', {prototype: proto});
 * v1.07 Support for onBlur
 * v1.06 Support von React 16, Added Events, Code Cleanup
 * v1.05 Initial commits and basic functionality
-
-## Credits
-
-Credits go to @josephnvu on Stack Overflow 
