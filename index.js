@@ -15,7 +15,7 @@ var mimickedReactEvents = {
     onInput: 'onChange',
     onFocusOut: 'onBlur',
     onSelectionChange: 'onSelect'
-}; 
+};
 
 module.exports = function retargetEvents(shadowRoot) {
 
