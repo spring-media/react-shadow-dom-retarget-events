@@ -26,7 +26,7 @@ This repo is his answer in an npm module (with some code cleanups and a bug fix)
 
 ## Usage
 
-import `retargetEvents` and call it with the `shadowDom`:
+import `retargetEvents` and call it with the `shadowRoot`:
 
 ```jsx
 import React from 'react';
