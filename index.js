@@ -41,6 +41,10 @@ module.exports = function retargetEvents(shadowRoot) {
                     dispatchEvent(event, mimickedReactEvents[reactEventName], props);
                 }
 
+                if (event.cancelBubble) { 
+                    break; 
+                }                
+
                 if (el === shadowRoot) {
                     break;
                 }
