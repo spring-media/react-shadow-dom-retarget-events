@@ -1,4 +1,4 @@
-var events = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimationIteration", "onAuxClick", "onBlur",
+var reactEvents = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimationIteration", "onAuxClick", "onBlur",
     "onChange", "onClick", "onClose", "onContextMenu", "onDoubleClick", "onError", "onFocus", "onGotPointerCapture",
     "onInput", "onKeyDown", "onKeyPress", "onKeyUp", "onLoad", "onLoadEnd", "onLoadStart", "onLostPointerCapture",
     "onMouseDown", "onMouseMove", "onMouseOut", "onMouseOver", "onMouseUp", "onPointerCancel", "onPointerDown",
@@ -19,7 +19,7 @@ var mimickedReactEvents = {
 
 module.exports = function retargetEvents(shadowRoot) {
 
-    events.forEach(function (reactEventName) {
+    reactEvents.forEach(function (reactEventName) {
 
         var nativeEventName = getNativeEventName(reactEventName);
 
