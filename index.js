@@ -25,20 +25,32 @@ module.exports = function retargetEvents(shadowRoot) {
 
         shadowRoot.addEventListener(nativeEventName, function (event) {
             
-            var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
+            // store the path in the event itself to use 
+            // throughout the life of the event to support nested
+            // retargeted shadowDoms
+            if(typeof event._retargetEventsPath === 'undefined'){
+                event._retargetEventsPath = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
+            }
 
-            for (var i = 0; i < path.length; i++) {
+            for (var i = 0; i < event._retargetEventsPath.length; i++) {
 
-                var el = path[i];
+                var el = event._retargetEventsPath[i];
                 var reactComponent = findReactComponent(el);
                 var props = findReactProps(reactComponent);
-
+    
                 if (reactComponent && props) {
                     dispatchEvent(event, reactEventName, props);
                 }
 
                 if (reactComponent && props && mimickedReactEvents[reactEventName]) {
                     dispatchEvent(event, mimickedReactEvents[reactEventName], props);
+                }
+                
+                // if the event triggered a callback in a react component,
+                // slice the path at the index of the el so that 
+                // the callback won't be triggered mutlple times
+                if (reactComponent && props && (props[reactEventName] || mimickedReactEvents[reactEventName])) {
+                    event._retargetEventsPath = event._retargetEventsPath.slice(event._retargetEventsPath.indexOf(el));
                 }
 
                 if (event.cancelBubble) { 
