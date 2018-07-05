@@ -24,26 +24,42 @@ module.exports = function retargetEvents(shadowRoot) {
         var nativeEventName = getNativeEventName(reactEventName);
 
         shadowRoot.addEventListener(nativeEventName, function (event) {
-            
+
             var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
 
-            for (var i = 0; i < path.length; i++) {
+            // Create an array on the event to keep track of events that
+            // trigger react callbacks. This will allow us to nest retargeted
+            // shadowRoots and prevent callbacks from firing multiple times
+            // (they will fire once for each nested shadowRoot if we don't do this).
+            if(typeof event._retargetEventElements === 'undefined'){
+                event._retargetEventElements = [];
+            }
 
+            for (var i = 0; i < path.length; i++) {
                 var el = path[i];
                 var reactComponent = findReactComponent(el);
                 var props = findReactProps(reactComponent);
-
+                var callbacksFired = 0;
                 if (reactComponent && props) {
-                    dispatchEvent(event, reactEventName, props);
+                    // if the event triggered a callback in a react component,
+                    // keep track by pushing the el into
+                    // event._retargetEventElements
+                    if(event._retargetEventElements.indexOf(el) === -1){
+                        callbacksFired += dispatchEvent(event, reactEventName, props) ? 1 : 0;
+                        if(mimickedReactEvents[reactEventName]){
+                            callbacksFired += dispatchEvent(event, mimickedReactEvents[reactEventName], props) ? 1 : 0;
+                        }
+                    }
+
+                    // A callback was fired if callbacksFired is one or more
+                    if(callbacksFired){
+                        event._retargetEventElements.push(el);
+                    }
                 }
 
-                if (reactComponent && props && mimickedReactEvents[reactEventName]) {
-                    dispatchEvent(event, mimickedReactEvents[reactEventName], props);
+                if (event.cancelBubble) {
+                    break;
                 }
-
-                if (event.cancelBubble) { 
-                    break; 
-                }                
 
                 if (el === shadowRoot) {
                     break;
@@ -68,10 +84,13 @@ function findReactProps(component) {
 
 }
 
+// Returns true if a callback was fired
 function dispatchEvent(event, eventType, componentProps) {
     if (componentProps[eventType]) {
         componentProps[eventType](event);
+        return true;
     }
+    return false;
 }
 
 function getNativeEventName(reactEventName) {
