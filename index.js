@@ -69,6 +69,10 @@ function findReactProps(component) {
 }
 
 function dispatchEvent(event, eventType, componentProps) {
+    event.persist = function() {
+        event.isPersistent = function(){ return true};
+    };
+
     if (componentProps[eventType]) {
         componentProps[eventType](event);
     }
