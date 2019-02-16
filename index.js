@@ -31,8 +31,15 @@ module.exports = function retargetEvents(shadowRoot) {
             for (var i = 0; i < path.length; i++) {
 
                 var el = path[i];
+                var props = null;
                 var reactComponent = findReactComponent(el);
-                var props = findReactProps(reactComponent);
+                var eventHandlers = findReactEventHandlers(el);
+
+                if (!eventHandlers) {
+                    props = findReactProps(reactComponent);
+                } else {
+                    props = eventHandlers;
+                }
 
                 if (reactComponent && props) {
                     dispatchEvent(event, reactEventName, props);
@@ -66,9 +73,17 @@ module.exports = function retargetEvents(shadowRoot) {
     };
 };
 
+function findReactEventHandlers(item) {
+    return findReactProperty(item, '__reactEventHandlers');
+}
+
 function findReactComponent(item) {
+    return findReactProperty(item, '_reactInternal');
+}
+
+function findReactProperty(item, propertyPrefix) {
     for (var key in item) {
-        if (item.hasOwnProperty(key) && key.indexOf('_reactInternal') !== -1) {
+        if (item.hasOwnProperty(key) && key.indexOf(propertyPrefix) !== -1) {
             return item[key];
         }
     }
