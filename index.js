@@ -18,12 +18,13 @@ var mimickedReactEvents = {
 };
 
 module.exports = function retargetEvents(shadowRoot) {
+    var removeEventListeners = [];
 
     reactEvents.forEach(function (reactEventName) {
 
         var nativeEventName = getNativeEventName(reactEventName);
-
-        shadowRoot.addEventListener(nativeEventName, function (event) {
+        
+        function retargetEvent(event) {
             
             var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
 
@@ -49,8 +50,20 @@ module.exports = function retargetEvents(shadowRoot) {
                     break;
                 }
             }
-        }, false);
+        }
+
+        shadowRoot.addEventListener(nativeEventName, retargetEvent, false);
+        
+        removeEventListeners.push(function () { shadowRoot.removeEventListener(nativeEventName, retargetEvent, false); })
     });
+    
+    return function () {
+      
+      removeEventListeners.forEach(function (removeEventListener) {
+        
+        removeEventListener();
+      });
+    };
 };
 
 function findReactComponent(item) {
