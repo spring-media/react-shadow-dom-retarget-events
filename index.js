@@ -1,7 +1,7 @@
 var reactEvents = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimationIteration", "onAuxClick", "onBlur",
     "onChange", "onClick", "onClose", "onContextMenu", "onDoubleClick", "onError", "onFocus", "onGotPointerCapture",
     "onInput", "onKeyDown", "onKeyPress", "onKeyUp", "onLoad", "onLoadEnd", "onLoadStart", "onLostPointerCapture",
-    "onMouseDown", "onMouseMove", "onMouseOut", "onMouseLeave", "onMouseOver", "onMouseUp", "onPointerCancel", "onPointerDown",
+    "onMouseDown", "onMouseMove", "onMouseOut", "onMouseOver", "onMouseUp", "onPointerCancel", "onPointerDown",
     "onPointerEnter", "onPointerLeave", "onPointerMove", "onPointerOut", "onPointerOver", "onPointerUp", "onReset",
     "onResize", "onScroll", "onSelect", "onSelectionChange", "onSelectStart", "onSubmit", "onTouchCancel",
     "onTouchMove", "onTouchStart", "onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd", "onDragEnter",
@@ -11,14 +11,22 @@ var divergentNativeEvents = {
     onDoubleClick: 'dblclick'
 };
 
-var mimickedReactEvents = {
+var defaultMimickedReactEvents = {
     onInput: 'onChange',
     onFocusOut: 'onBlur',
-    onSelectionChange: 'onSelect',
-    onMouseOut: 'onMouseLeave'
+    onSelectionChange: 'onSelect'
 };
 
-module.exports = function retargetEvents(shadowRoot) {
+var defaultOptions = {
+    dispatchDegradedOnMouseLeaveEvents: false
+};
+
+module.exports = function retargetEvents(shadowRoot, options = defaultOptions) {
+    var mimickedReactEvents = Object.assign({}, defaultMimickedReactEvents);
+    if (options.dispatchDegradedOnMouseLeaveEvents) {
+        mimickedReactEvents.onMouseOut = 'onMouseLeave';
+    }
+
     var removeEventListeners = [];
 
     reactEvents.forEach(function (reactEventName) {
