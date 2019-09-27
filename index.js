@@ -52,7 +52,14 @@ module.exports = function retargetEvents(shadowRoot) {
             }
         }
 
-        shadowRoot.addEventListener(nativeEventName, retargetEvent, false);
+        var eventListenerOptions = false;
+
+        // See https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
+        if (supportsPassiveEventListeners() && (nativeEventName === 'touchmove' || nativeEventName === 'touchstart')) {
+            eventListenerOptions = {capture: true, passive: true};
+        }
+
+        shadowRoot.addEventListener(nativeEventName, retargetEvent, eventListenerOptions);
         
         removeEventListeners.push(function () { shadowRoot.removeEventListener(nativeEventName, retargetEvent, false); })
     });
@@ -109,4 +116,20 @@ function composedPath(el) {
     }
     el = el.parentElement;
   }
+}
+
+// Copied from https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection
+function supportsPassiveEventListeners() {
+  var supportsPassive = false;
+  try {
+    var opts = Object.defineProperty({}, 'passive', {
+        get: function() {
+        supportsPassive = true;
+        }
+    });
+    window.addEventListener("testPassive", null, opts);
+    window.removeEventListener("testPassive", null, opts);
+  } catch (e) {}
+
+  return supportsPassive;
 }
