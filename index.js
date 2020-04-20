@@ -4,8 +4,8 @@ var reactEvents = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimatio
     "onMouseDown", "onMouseMove", "onMouseOut", "onMouseOver", "onMouseUp", "onPointerCancel", "onPointerDown",
     "onPointerEnter", "onPointerLeave", "onPointerMove", "onPointerOut", "onPointerOver", "onPointerUp", "onReset",
     "onResize", "onScroll", "onSelect", "onSelectionChange", "onSelectStart", "onSubmit", "onTouchCancel",
-    "onTouchMove", "onTouchStart", "onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd", "onDragEnter",
-    "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop", "onFocusOut"];
+    "onTouchMove", "onTouchStart", "onTouchEnd","onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd",
+    "onDragEnter", "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop", "onFocusOut"];
 
 var divergentNativeEvents = {
     onDoubleClick: 'dblclick'
@@ -23,9 +23,9 @@ module.exports = function retargetEvents(shadowRoot) {
     reactEvents.forEach(function (reactEventName) {
 
         var nativeEventName = getNativeEventName(reactEventName);
-        
+
         function retargetEvent(event) {
-            
+
             var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
 
             for (var i = 0; i < path.length; i++) {
@@ -42,9 +42,9 @@ module.exports = function retargetEvents(shadowRoot) {
                     dispatchEvent(event, mimickedReactEvents[reactEventName], props);
                 }
 
-                if (event.cancelBubble) { 
-                    break; 
-                }                
+                if (event.cancelBubble) {
+                    break;
+                }
 
                 if (el === shadowRoot) {
                     break;
@@ -53,14 +53,14 @@ module.exports = function retargetEvents(shadowRoot) {
         }
 
         shadowRoot.addEventListener(nativeEventName, retargetEvent, false);
-        
+
         removeEventListeners.push(function () { shadowRoot.removeEventListener(nativeEventName, retargetEvent, false); })
     });
-    
+
     return function () {
-      
+
       removeEventListeners.forEach(function (removeEventListener) {
-        
+
         removeEventListener();
       });
     };
