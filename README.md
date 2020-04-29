@@ -51,6 +51,24 @@ const proto = Object.create(HTMLElement.prototype, {
 });
 document.registerElement('my-custom-element', {prototype: proto});
 ```
+
+## Degraded behaviors
+### onMouseLeave
+Since [`onMouseLeave` does not bubble](https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseleave_event),
+it is impossible to retarget it correctly.
+However, it is possible to send fake `onMouseLeave` events when `onMouseOut` is triggered.
+This behavior will not be 100% identical to the original one, but it could solve some issues.
+To enable this behavior, set the `dispatchDegradedOnMouseLeaveEvents` option (disabled by default):
+
+```jsx
+retargetEvents(
+  shadowRoot,
+  {
+    dispatchDegradedOnMouseLeaveEvents: true
+  }
+);
+```
+
 ## History
 
 * v1.08 Support for cancelBubble and FireFox's composedPath

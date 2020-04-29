@@ -11,13 +11,22 @@ var divergentNativeEvents = {
     onDoubleClick: 'dblclick'
 };
 
-var mimickedReactEvents = {
+var defaultMimickedReactEvents = {
     onInput: 'onChange',
     onFocusOut: 'onBlur',
     onSelectionChange: 'onSelect'
 };
 
-module.exports = function retargetEvents(shadowRoot) {
+var defaultOptions = {
+    dispatchDegradedOnMouseLeaveEvents: false
+};
+
+module.exports = function retargetEvents(shadowRoot, options = defaultOptions) {
+    var mimickedReactEvents = Object.assign({}, defaultMimickedReactEvents);
+    if (options.dispatchDegradedOnMouseLeaveEvents) {
+        mimickedReactEvents.onMouseOut = 'onMouseLeave';
+    }
+
     var removeEventListeners = [];
 
     reactEvents.forEach(function (reactEventName) {
