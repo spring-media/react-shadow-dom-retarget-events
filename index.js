@@ -33,6 +33,10 @@ module.exports = function retargetEvents(shadowRoot) {
                 var el = path[i];
                 var reactComponent = findReactComponent(el);
                 var props = findReactProps(reactComponent);
+                
+                if (el && el.getAttribute && el.getAttribute("disabled") != null) {
+                    return;
+                }
 
                 if (reactComponent && props) {
                     dispatchEvent(event, reactEventName, props);
