@@ -5,7 +5,7 @@ var reactEvents = ["onAbort", "onAnimationCancel", "onAnimationEnd", "onAnimatio
     "onPointerEnter", "onPointerLeave", "onPointerMove", "onPointerOut", "onPointerOver", "onPointerUp", "onReset",
     "onResize", "onScroll", "onSelect", "onSelectionChange", "onSelectStart", "onSubmit", "onTouchCancel",
     "onTouchMove", "onTouchStart", "onTouchEnd","onTransitionCancel", "onTransitionEnd", "onDrag", "onDragEnd",
-    "onDragEnter", "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop", "onFocusOut"];
+    "onDragEnter", "onDragExit", "onDragLeave", "onDragOver", "onDragStart", "onDrop", "onFocusOut", "onWheel"];
 
 var divergentNativeEvents = {
     onDoubleClick: 'dblclick'
@@ -26,6 +26,7 @@ module.exports = function retargetEvents(shadowRoot) {
 
         function retargetEvent(event) {
 
+            event.nativeEvent = event;
             var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
 
             for (var i = 0; i < path.length; i++) {
